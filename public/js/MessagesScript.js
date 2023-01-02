@@ -39,11 +39,16 @@ function newMessage(id, user, content, datetime) {
     msgBox.appendChild(msgToolBar)
 
     let msgDatetime = document.createElement("msg-datetime")
-    if (new Date().toLocaleString().split(', ')[0] == datetime.split(', ')[0]) {
-        msgDatetime.innerText = datetime.split(', ')[1]
-    } else {
+    try {
+        if (new Date().toLocaleString().split(', ')[0] == datetime.split(', ')[0]) {
+            msgDatetime.innerText = datetime.split(', ')[1]
+        } else {
+            msgDatetime.innerText = datetime
+        }
+    } catch (TypeError) {
         msgDatetime.innerText = datetime
     }
+
     msgBox.appendChild(msgDatetime)
 
     return msgBox;
