@@ -1,0 +1,99 @@
+const fs = require('fs')
+const express = require('express')
+const router = express.Router()
+const encdec = require('../helpers/encdec');
+const validations = require('../helpers/validations')
+const firebase = require('../helpers/firebase-rt-db');
+const database = new firebase.FirebaseRtDB(
+    "../private/secretroom-76218-firebase-adminsdk-credentials.json",
+    "https://secretroom-76218-default-rtdb.europe-west1.firebasedatabase.app/"
+)
+
+router.post('/host', (req, res) => {
+    fs.readdir('./rooms', (err, files) => {
+        if (err) throw err;
+
+        for (let i of files) {
+            if (i == req.body['RoomID']) {
+                return res.json({ 'status': 'NOT_ALLOWED' })
+            }
+        }
+        let RoomValKey = encdec.createValKey(32)
+        let ClientValKey = encdec.createValKey(8)
+        let ClientID = req.body['HostID']
+        fs.mkdirSync(`./rooms/${req.body['RoomID']}`)
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/chat.json`, JSON.stringify({}))
+        let RoomInfoData = { 'room_val_key': RoomValKey, 'host': ClientID, members: {} }
+        RoomInfoData['members'][ClientID] = ClientValKey
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/info.json`, JSON.stringify(RoomInfoData))
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/requests.json`, JSON.stringify({}))
+        return res.json({ 'status': 'ALLOWED', 'room_val_key': RoomValKey, 'client_val_key': ClientValKey, 'client_type': 'host' })
+    })
+})
+
+router.post('/request-to-join', (req, res) => {
+    fs.readdir('./rooms', (err, rooms) => {
+        if (err) throw err;
+
+        for (let room of rooms) {
+            if (room == req.body['RoomID']) {
+                let memberExists = false
+                for (const member of Object.keys(JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/info.json`))['members'])) {
+                    if (member == req.body['JoinerID']) {
+                        memberExists = true
+                        return res.json({ 'status': 'INVALID_JOINER_ID' })
+                    }
+                }
+
+                let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/requests.json`))
+                RequestsData[req.body['JoinerID']] = 0
+                fs.writeFileSync(`./rooms/${req.body['RoomID']}/requests.json`, JSON.stringify(RequestsData))
+                return res.json({ 'status': 'FOUND' });
+            }
+        }
+        return res.json({ 'status': 'NOT_FOUND' });
+    })
+})
+
+router.post('/check-acceptance', (req, res) => {
+    let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/requests.json`))
+    if (RequestsData[req.body['JoinerID']] == 1) {
+        let RoomInfoData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/info.json`))
+        let ClientValKey = encdec.createValKey(8)
+        let NewMembers = RoomInfoData['members']
+        NewMembers[req.body['JoinerID']] = ClientValKey
+        RoomInfoData['members'] = NewMembers
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/info.json`, JSON.stringify(RoomInfoData));
+        return res.json({ 'status': 'ALLOWED', 'room_val_key': RoomInfoData['room_val_key'], 'client_val_key': ClientValKey, 'client_type': 'joiner' })
+    } else if (RequestsData[req.body['JoinerID']] == -1) {
+        return res.json({ 'status': 'NOT_ALLOWED' })
+    }
+    return res.json({ 'status': 'NO_DECISION' })
+})
+
+let exitTimeouts = {}
+router.post('/host-exit', (req, res) => {
+    const ExitDelay = 5000
+    if (
+        req.body['command'] == 'clear_room'
+        && validations.validateClientAndRoom(req.body['clientid'], req.body['roomid'])
+        && validations.validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        exitTimeouts[req.body['roomid']] = setTimeout(() => {
+            fs.rmSync(`./rooms/${req.body['roomid']}`, {
+                recursive: true,
+                force: true
+            })
+            res.sendStatus(200)
+        }, ExitDelay)
+    } else if (
+        req.body['command'] == 'cancel_clear_room'
+        && validations.validateClientAndRoom(req.body['clientid'], req.body['roomid'])
+        && validations.validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        clearTimeout(exitTimeouts[req.body['roomid']])
+        res.sendStatus(200)
+    }
+})
+
+module.exports = router

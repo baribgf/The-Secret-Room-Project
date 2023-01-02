@@ -1,0 +1,195 @@
+// importing required modules
+const http = require('http');
+const express = require('express');
+const fs = require('fs');
+const crypto = require('crypto');
+const app = express();
+const validation = require('./helpers/validations');
+
+app.use(express.static(__dirname + "/public"));
+app.use(express.json());
+
+app.get('/favicon.ico', (req, res) => {
+    res.sendStatus(200);
+})
+
+app.post('/api', (req, res) => {
+    if (
+        req.body["command"] === "read_chat"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+    ) { // get text from chat area and pushing it into message file
+        fs.readFile(`./rooms/${req.body['roomid']}/chat.txt`, (err, data) => {
+            if (err) console.error(err.message);
+            res.send(data);
+        })
+    } else if (
+        req.body["command"] == "write_message"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientAndKey(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        fs.appendFile(`./rooms/${req.body["roomid"]}/chat.txt`, req.body["message"], (err) => { if (err) throw err });
+    } else if (
+        req.body["command"] == "check_requests"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['roomid']}/requests.json`))
+        let locRequest = null
+        for (const request of Object.keys(RequestsData)) {
+            if (RequestsData[request] == 0) {
+                locRequest = request
+                break;
+            }
+        }
+
+        if (locRequest != null) {
+            res.json({ 'status': 'FOUND', 'request': locRequest })
+        } else {
+            res.json({ 'status': 'NOT_FOUND' })
+        }
+
+    } else if (
+        req.body["command"] == "accept_request"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['roomid']}/requests.json`))
+        RequestsData[req.body['request']] = 1
+        fs.writeFileSync(`./rooms/${req.body['roomid']}/requests.json`, JSON.stringify(RequestsData))
+    } else if (
+        req.body["command"] == "refuse_request"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['roomid']}/requests.json`))
+        RequestsData[req.body['request']] = -1
+        fs.writeFileSync(`./rooms/${req.body['roomid']}/requests.json`, JSON.stringify(RequestsData))
+    } else if (
+        req.body["command"] === "get_members"
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+    ) {
+        const RoomInfo = JSON.parse(fs.readFileSync(`./rooms/${req.body["roomid"]}/info.json`))
+        const members = Object.keys(RoomInfo['members'])
+        let MembersData = {}
+        for (const member of members) {
+            if (member == RoomInfo['host']) {
+                MembersData[member] = "Host"
+            } else {
+                MembersData[member] = "Joiner"
+            }
+        }
+        res.json(MembersData)
+    } else {
+        res.send("404")
+    }
+});
+
+function createValKey(size) {
+    let ValKey = crypto.randomBytes(size).toString('hex');
+    let perm = false
+    while (perm == false) {
+        let found = false
+        for (const room of fs.readdirSync('./rooms')) {
+            if (JSON.parse(fs.readFileSync(`./rooms/${room}/info.json`))['room_val_key'] == ValKey) {
+                found = true
+                ValKey = crypto.randomBytes(size).toString('hex')
+            }
+        }
+        if (found == false) return ValKey;
+    }
+}
+
+app.post('/host', (req, res) => {
+    fs.readdir('./rooms', (err, files) => {
+        if (err) throw err;
+
+        for (let i of files) {
+            if (i == req.body['RoomID']) {
+                return res.json({ 'status': 'NOT_ALLOWED' })
+            }
+        }
+        let RoomValKey = createValKey(32)
+        let ClientValKey = createValKey(8)
+        let ClientID = req.body['HostID']
+        fs.mkdirSync(`./rooms/${req.body['RoomID']}`)
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/chat.txt`, "<chat-header>")
+        let RoomInfoData = { 'room_val_key': RoomValKey, 'host': ClientID, members: {} }
+        RoomInfoData['members'][ClientID] = ClientValKey
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/info.json`, JSON.stringify(RoomInfoData))
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/requests.json`, JSON.stringify({}))
+        return res.json({ 'status': 'ALLOWED', 'room_val_key': RoomValKey, 'client_val_key': ClientValKey, 'client_type': 'host' })
+    })
+});
+
+app.post('/request-to-join', (req, res) => {
+    fs.readdir('./rooms', (err, rooms) => {
+        if (err) throw err;
+
+        for (let room of rooms) {
+            if (room == req.body['RoomID']) {
+                let memberExists = false
+                for (const member of Object.keys(JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/info.json`))['members'])) {
+                    if (member == req.body['JoinerID']) {
+                        memberExists = true
+                        return res.json({ 'status': 'INVALID_JOINER_ID' })
+                    }
+                }
+
+                let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/requests.json`))
+                RequestsData[req.body['JoinerID']] = 0
+                fs.writeFileSync(`./rooms/${req.body['RoomID']}/requests.json`, JSON.stringify(RequestsData))
+                return res.json({ 'status': 'FOUND' });
+            }
+        }
+        return res.json({ 'status': 'NOT_FOUND' });
+    })
+});
+
+app.post('/check-acceptance', (req, res) => {
+    let RequestsData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/requests.json`))
+    if (RequestsData[req.body['JoinerID']] == 1) {
+        let RoomInfoData = JSON.parse(fs.readFileSync(`./rooms/${req.body['RoomID']}/info.json`))
+        let ClientValKey = createValKey(8)
+        let NewMembers = RoomInfoData['members']
+        NewMembers[req.body['JoinerID']] = ClientValKey
+        RoomInfoData['members'] = NewMembers
+        fs.writeFileSync(`./rooms/${req.body['RoomID']}/info.json`, JSON.stringify(RoomInfoData));
+        return res.json({ 'status': 'ALLOWED', 'room_val_key': RoomInfoData['room_val_key'], 'client_val_key': ClientValKey, 'client_type': 'joiner' })
+    } else if (RequestsData[req.body['JoinerID']] == -1) {
+        return res.json({ 'status': 'NOT_ALLOWED' })
+    }
+    return res.json({ 'status': 'NO_DECISION' })
+})
+
+let exitTimeouts = {}
+app.post('/host-exit', (req, res) => {
+    const ExitDelay = 5000
+    if (
+        req.body['command'] == 'clear_room'
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        exitTimeouts[req.body['roomid']] = setTimeout(() => {
+            fs.rmSync(`./rooms/${req.body['roomid']}`, {
+                recursive: true,
+                force: true
+            })
+            res.sendStatus(200)
+        }, ExitDelay)
+    } else if (
+        req.body['command'] == 'cancel_clear_room'
+        && validateRoomAndKey(req.body['roomid'], req.body['room_val_key'])
+        && validateClientType(req.body['clientid'], req.body['roomid'], req.body['client_val_key'])
+    ) {
+        clearTimeout(exitTimeouts[req.body['roomid']])
+        res.sendStatus(200)
+    }
+})
+
+const options = {
+    key: fs.readFileSync('./http-options/server.key'),
+    cert: fs.readFileSync('./http-options/server.cert')
+};
+http.createServer(options, app).listen(8081, () => {
+    console.log('Server running at http://127.0.0.1:8081/');
+});
