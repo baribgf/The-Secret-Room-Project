@@ -19,7 +19,7 @@ router.post('/host', (req, res) => {
             database.update('/rooms', JSON.parse(`{"${req.body['RoomID']}": "{}"}`))
             database.update(`/rooms/${req.body['RoomID']}`, JSON.parse(`{ "base": "{}" }`))
             database.update(`/rooms/${req.body['RoomID']}`, JSON.parse(`{ "chat": "{}" }`))
-            database.update(`/rooms/${req.body['RoomID']}/chat`, JSON.parse(`{ "base": "{}" }`))
+            database.update(`/rooms/${req.body['RoomID']}/chat`, JSON.parse(`{ "base": "" }`))
             let RoomInfoData = { 'room_val_key': RoomValKey, 'host': ClientID, members: {} }
             RoomInfoData['members'][ClientID] = ClientValKey
             database.update(`/rooms/${req.body['RoomID']}`, JSON.parse(`{ "info": ${JSON.stringify(RoomInfoData)} }`))
