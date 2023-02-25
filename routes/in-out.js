@@ -94,7 +94,7 @@ router.post('/check-acceptance', async (req, res) => {
 
 let exitTimeouts = {}
 router.post('/host-exit', (req, res) => {
-    const ExitDelay = 5000
+    const ExitDelay = 10000
     try {
         if (
             req.body['command'] == 'clear_room'
