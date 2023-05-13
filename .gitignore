@@ -5,3 +5,4 @@ private/**
 
 package-lock.json
 !private/.gitkeep
+.gitpod.yml
