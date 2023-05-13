@@ -5,6 +5,7 @@
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js",
+    "debug": "nodemon Server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Bari BGF",

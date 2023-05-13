@@ -2,11 +2,11 @@
 const express = require('express')
 const app = express()
 const api = require('./routes/api')
-const inout = require('./routes/in-out')
+const serverIO = require('./routes/server-io')
 
 app.use(express.static(__dirname + "/public"))
 app.use(express.json())
-app.use("/", api, inout)
+app.use("/", api, serverIO)
 
 const PORT = 8081
 app.listen(PORT, () => {
