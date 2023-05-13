@@ -1,6 +1,7 @@
 node_modules
-/backups
-/package-lock.json
+backups
 .vscode
-/private/**
-!/private/.gitkeep
+private/**
+
+package-lock.json
+!private/.gitkeep
