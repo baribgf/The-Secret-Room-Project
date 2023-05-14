@@ -46,64 +46,68 @@ header {
     vertical-align: middle;
 }
 
-article {
-    height: 84%;
-    background-color: #0e181f;
+nav {
+    height: 6%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 
-#article-toolbar {
+#toolbar {
     background-color: #121c22;
     color: #dbeeff;
-    height: 8%;
+    height: 100%;
+    width: 100%;
 }
 
-#article-toolbar span {
+#toolbar span {
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     padding: 1% 2%;
 }
-#article-toolbar span:hover {
+#toolbar span:hover {
     background-color: #0e181f;
+}
+
+article {
+    height: 78%;
+    background-color: #0e181f;
+    display: flex;
 }
 
 #members-section {
     display: flex;
     flex-direction: column;
-    width: 100%;
-}
-
-#members-collapser {
-    padding: 1%;
-    justify-content: center;
-    align-items: center;
+    width: 20%;
+    height: 100%;
 }
 
 #members-list {
-    display: none;
     flex-direction: column;
     background-color: #0e181f;
     color: aliceblue;
     justify-content: space-around;
     padding: 0;
     margin: 0;
-    height: 26%;
-    width: 42%;
+    height: 100%;
+    width: 100%;
     overflow-y: scroll;
-    position: absolute;
 }
 
 #members-list::-webkit-scrollbar {
-    background-color: #110f22;
+    background-color: transparent;
 }
 #members-list::-webkit-scrollbar-thumb {
-    background-color: #0f0d1f;
+    background-color: #121b22;
 }
 
 .member {
+    display: grid;
+    grid-template-columns: 90% 10%;
     list-style: none;
-    padding: 1.6% 2%;
+    padding: 2% 0% 2% 5%;
     justify-content: space-between;
     width: 100%;
 }
@@ -113,7 +117,7 @@ article {
 }
 
 .member-del-item {
-    width: 10%;
+    width: 100%;
     text-align: center;
 }
 .member-del-item:hover {
@@ -125,15 +129,15 @@ article {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 92%;
-    width: 100%;
+    height: 100%;
+    width: 80%;
     padding: 0%;
 }
 
 #chat-area {
     background-color: #1B262C;
     height: 88%;
-    width: 75%;
+    width: 100%;
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -142,10 +146,10 @@ article {
 }
 
 #chat-area::-webkit-scrollbar {
-    background: linear-gradient(#3c2363, #183772)
+    background-color: transparent;
 }
 #chat-area::-webkit-scrollbar-thumb {
-    background-color: #1c2064;
+    background-color: #121b22;
 }
 
 #chat-header {
@@ -168,7 +172,7 @@ msg-container {
     display: flex;
     flex-direction: column;
     padding: 0.25% 1%;
-    margin: 1%;
+    margin: 0.5%;
     border-radius: 10px;
 }
 
@@ -221,7 +225,7 @@ msg-datetime {
     flex-direction: row;
     justify-content: space-evenly;
     height: 12%;
-    width: 75%;
+    width: 100%;
 }
 
 #text-area {

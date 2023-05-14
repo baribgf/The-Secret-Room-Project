@@ -10,7 +10,7 @@ const RoomID = localStorage.getItem('secretroom_room_id');
 const RoomValKey = localStorage.getItem('secretroom_room_val_key');
 
 var ChatData = "";
-var MembersData = "";
+var MembersData = {};
 var Connected = true;
 const RIGHT_MSG_COLORS = ["#096386", "#233E8B"];
 const LEFT_MSG_COLORS = ["#464159", "#464255"];
@@ -135,9 +135,8 @@ function loadChat() {
                 if (data.toString() != ChatData.toString() && data['status'] != 'NO') {
                     ChatData = data
                     $(ChatArea).empty()
-
-                    for (let i = 0; i < data.length; i++) {
-                        ChatArea.appendChild(newMessage(data[i][0], data[i][1], data[i][2], data[i][3]));
+                    for (let msg of data) {
+                        ChatArea.appendChild(newMessage(msg[0], msg[1], msg[2], msg[3]));
                     }
 
                     ChatArea.scrollTop = ChatArea.scrollHeight;
@@ -173,26 +172,35 @@ function getMembers() {
                 return res.json()
             })
             .then(data => {
-                if (MembersData != data) {
+                if (JSON.stringify(MembersData) != JSON.stringify(data)) {
                     MembersData = data;
                     $(MembersList).empty()
                     for (const member of Object.keys(MembersData)) {
                         const memElem = document.createElement("li")
-                        memElem.setAttribute("class", "member horizontal-container")
-                        memElem.innerHTML = member
-                        const memTypeElem = document.createElement("span")
-                        memTypeElem.setAttribute("class", "member-type-elem")
-                        memTypeElem.innerHTML = MembersData[member]
-                        memElem.appendChild(memTypeElem)
+                        memElem.setAttribute("class", "member")
+                        
+                        const memNameElem = document.createElement("span")
+                        memNameElem.innerHTML = member
+                        memNameElem.style.gridColumn = 1
+                        memElem.appendChild(memNameElem)
 
                         if (ClientType === "host" && member != ClientID) {
                             const memDelElem = document.createElement("span")
                             memDelElem.setAttribute("class", "member-del-item")
+                            memDelElem.style.gridColumn = 2
                             memDelElem.innerText = "X"
                             memDelElem.onclick = () => {
                                 deleteJoiner(member)
                             }
                             memElem.appendChild(memDelElem)
+                        }
+
+                        if (MembersData[member] === "Host") {
+                            const hostTypeElem = document.createElement("span")
+                            hostTypeElem.innerText = "Host"
+                            hostTypeElem.style.gridColumn = 2
+                            memElem.style.gridTemplateColumns = "85% 15%"
+                            memElem.appendChild(hostTypeElem)
                         }
 
                         MembersList.appendChild(memElem)
@@ -317,3 +325,23 @@ if (ClientType === "host") {
             })
     })
 }
+
+///////////////////////
+
+document.querySelector("html").style.height = document.documentElement.scrollHeight + "px";
+document.addEventListener("keydown", e => {
+    if (e.key != "Enter") {
+        document.getElementById("text-area").focus()
+    }
+})
+
+TextArea.addEventListener("keydown", e => {
+    if (e.key == "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        SendButton.click();
+    }
+})
+
+$(function () {
+    document.getElementById("client-room-view").innerHTML = `${ClientID} -> ${RoomID}`
+})

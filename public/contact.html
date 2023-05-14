@@ -13,10 +13,16 @@
     <div class="vertical-container">
         <h1 id="contact-title"><mark>&nbsp;.: Contact :.&nbsp;</mark></h1>
         <br>
-        <h3 id="contact-text">
-            # Me on <a href="#">Facebook</a> <br>
-            # My <a href="#">YouTube Channel</a> <br>
-            # My <a href="#">GitHub</a> account
+        <h3 id="contacts-container">
+            <style>
+                #contacts-container {
+                    display: flex;
+                    flex-direction: column;
+                }
+            </style>
+            <span># Me on <a href="https://web.facebook.com/baribgf.707">Facebook</a></span>
+            <span># My <a href="https://www.youtube.com/channel/UCslZAUuv00G5h_oY6sfEOvg">YouTube</a> Channel</span>
+            <span># My <a href="https://github.com/baribgf">GitHub</a> account</span>
         </h3>
     </div>
     <style>
@@ -64,7 +70,7 @@
 
 <footer>
     <div id="footer-container">
-        <p>Developed by <u>Bari BGF</u></p>
+        <p>Developed by <a class="private" href="./contact.html">Bari BGF</a></p>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="./index.html"><strong>Home</strong></a>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -84,6 +90,10 @@
         #footer-container p {
             padding: 0;
             margin: 0 0 0 2%;
+        }
+
+        #footer-container .private:visited {
+            color: white;
         }
     </style>
 </footer>

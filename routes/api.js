@@ -53,15 +53,19 @@ router.post('/api-cr', async (req, res) => {
         if (
             req.body["command"] === "read_chat"
         ) { // get text from chat area and pushing it into message file
-            const CHAT_PATH = `/rooms/${req.body["roomid"]}/chat`
-            let Messages = []
+            const CHAT_PATH = `/rooms/${req.body["roomid"]}/chat`;
+            const MAX_MSG_NUM = 100;
+            let Messages = [];
             let ChatData = await database.getSync(CHAT_PATH)
             
             if (ChatData != undefined) {
+                let n = 0;
             	for (let i of Object.keys(ChatData)) {
-    	            Messages.push([i, ChatData[i][0], ChatData[i][1], ChatData[i][2]])
+                    if (i == 'base') continue;
+    	            Messages.push([i, ChatData[i][0], ChatData[i][1], ChatData[i][2]]);
+                    n++;
     	        }
-	            res.send(Messages);
+	            res.send(Messages.slice(n - Math.min(MAX_MSG_NUM, n), n));
     	    } else {
     	    	res.send({'status': 'NO'})
     	    }

@@ -17,21 +17,22 @@
             <a id="header-text" href="./index.html">SecretRoom</a>
         </div>
     </header>
-    <article class="vertical-container">
-        <div class="horizontal-container" id="article-toolbar">
-            <span id="members-collapser">Members &nbsp<img style="width: 25%;" src="../assets/img/group.svg"></span>
+    <nav class="horizontal-container">
+        <div class="horizontal-container" id="toolbar">
             <span id="client-room-view">Client -> Room</span>
         </div>
-        <!--  -->
+    </nav>
+    <article class="horizontal-container">
         <div id="members-section">
             <ul id="members-list">
             </ul>
         </div>
-        <!--  -->
         <div id="messaging-section">
             <div id="chat-area">
                 <div id="chat-header">
-                    <h4>< Begin new secret conversation ></h4>
+                    <h4>
+                        < Begin new secret conversation>
+                    </h4>
                 </div>
                 <div id="chat-body">
                 </div>
@@ -44,7 +45,7 @@
     </article>
     <footer>
         <div id="footer-container">
-            <p>Developed by <u>Bari BGF</u></p>
+            <p>Developed by <a class="private" href="./contact.html">Bari BGF</a></p>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href="./about.html"><strong>About</strong></a>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -65,29 +66,13 @@
                 padding: 0;
                 margin: 0 0 0 2%;
             }
+
+            #footer-container .private:visited {
+                color: white;
+            }
         </style>
     </footer>
     <script src="./js/MessagesScript.js"></script>
-    <script type="text/javascript">
-        document.querySelector("html").style.height = document.documentElement.scrollHeight + "px";
-        document.addEventListener("keydown", ()=>{
-            document.getElementById("text-area").focus()
-        })
-
-        $(function () {
-            let MembersCollapser = document.getElementById("members-collapser")
-            let MembersList = document.getElementById("members-list")
-            let AnimDuration = 150
-
-            $(MembersCollapser).click((e) => {
-                $(MembersList).toggle(AnimDuration)
-            })
-        })
-
-        $(function () {
-            document.getElementById("client-room-view").innerHTML = `${ClientID} -> ${RoomID}`
-        })
-    </script>
 </body>
 
 </html>
