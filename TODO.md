@@ -1,0 +1,6 @@
+- Handle the large-content messages.
+- Replace the message-hovering behaviour panel "Words -> Icons".
+- Make the banned joiner knows that he's banned from room (not just 403 error).
+- More UI improvements.
+- More chatting options (Voice, image, ... messages, Voice, video meetings, ...etc).
+- Continue in development.
