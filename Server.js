@@ -2,9 +2,6 @@
 const fs = require('fs')
 const express = require('express')
 const app = express()
-
-fs.writeFileSync("./private/firebase-credentials.json", process.env.FB_CREDENTIALS)
-
 const api = require('./routes/api')
 const serverIO = require('./routes/server-io')
 
