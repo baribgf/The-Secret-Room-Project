@@ -13,7 +13,11 @@ To start using this project ensure the following steps:
 npm install
 ```
 
-- Create a firebase-api-credentials file and place it in: private/secretroom-firebase-api-credentials.json
+- Create a firebase realtime database, configure its API and then:
+```
+export FB_CREDENTIALS="<your-credentials-file-content>"
+export FB_DB_URL="<your-firebase-database-url>"
+```
 
 - Start the server:
 ```
