@@ -5,7 +5,7 @@ class FirebaseRtDB {
     database = null
     constructor(credentialsPath, databaseUrl) {
         firebaseAdmin.initializeApp({
-            credential: firebaseAdmin.credential.cert(require(credentialsPath)),
+            credential: firebaseAdmin.credential.cert(credentialsPath),
             databaseURL: databaseUrl
         })
         this.database = firebaseAdmin.database()
