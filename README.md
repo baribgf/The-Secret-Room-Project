@@ -22,6 +22,6 @@ npm start
 
 ### Note
 
-This project is under development, so for any feedback please contact me or create an issue, and for collaboration just create a pull request.
+This project is under development, so for any feedback please contact me or create an issue, and for contribution just create a pull request.
 
 > Take Care . .
