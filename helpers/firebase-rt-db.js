@@ -1,13 +1,8 @@
-
 const firebaseAdmin = require("firebase-admin");
 
 class FirebaseRtDB {
-    database = null
-    constructor(credentialsPath, databaseUrl) {
-        firebaseAdmin.initializeApp({
-            credential: firebaseAdmin.credential.cert(credentialsPath),
-            databaseURL: databaseUrl
-        })
+    constructor(creds) {
+        firebaseAdmin.initializeApp(JSON.parse(creds))
         this.database = firebaseAdmin.database()
     }
 
@@ -24,7 +19,7 @@ class FirebaseRtDB {
         await new Promise((resolve, reject) => {
             this.database.ref(path).once('value', (snapshot) => {
                 data = snapshot.val()
-                if (typeof(data) != "object") {
+                if (typeof (data) != "object") {
                     data = JSON.parse(data)
                 }
                 resolve()
