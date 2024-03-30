@@ -9,16 +9,28 @@ The project is build in `Express js` framework implementing the `Firebase API` f
 To start using this project ensure the following steps:
 
 - Install required packages:
+
 ```
 npm install
 ```
 
-- Create a firebase realtime database, configure its API and then:
+- Create a firebase realtime database, get the application credentials like stated here: [Firebase docs web](https://firebase.google.com/docs/web/setup) and then paste them as the following:
+
 ```
-export FB_CREDENTIALS="<your-credentials-file-content>"
+export FB_CREDENTIALS={ \
+  apiKey: "API_KEY", \
+  authDomain: "PROJECT_ID.firebaseapp.com", \
+  databaseURL: "https://DATABASE_NAME.firebaseio.com", \
+  projectId: "PROJECT_ID", \
+  storageBucket: "PROJECT_ID.appspot.com", \
+  messagingSenderId: "SENDER_ID", \
+  appId: "APP_ID", \
+  measurementId: "G-MEASUREMENT_ID", \
+}
 ```
 
 - Start the server:
+
 ```
 npm start
 ```

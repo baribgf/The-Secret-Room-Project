@@ -2,7 +2,7 @@ const firebaseAdmin = require("firebase-admin");
 
 class FirebaseRtDB {
     constructor(creds) {
-        firebaseAdmin.initializeApp(eval(creds))
+        firebaseAdmin.initializeApp(eval(`new Object(${creds})`))
         this.database = firebaseAdmin.database()
     }
 
