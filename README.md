@@ -14,19 +14,11 @@ To start using this project ensure the following steps:
 npm install
 ```
 
-- Create a firebase realtime database, get the application credentials like stated here: [Firebase docs web](https://firebase.google.com/docs/web/setup) and then paste them as the following:
+- Create a firebase realtime database, get the application credentials like stated here: [Google service account docs](https://developers.google.com/identity/protocols/oauth2/service-account), get the database url and then paste them as the following:
 
 ```
-export FB_CREDENTIALS={ \
-  apiKey: "API_KEY", \
-  authDomain: "PROJECT_ID.firebaseapp.com", \
-  databaseURL: "https://DATABASE_NAME.firebaseio.com", \
-  projectId: "PROJECT_ID", \
-  storageBucket: "PROJECT_ID.appspot.com", \
-  messagingSenderId: "SENDER_ID", \
-  appId: "APP_ID", \
-  measurementId: "G-MEASUREMENT_ID", \
-}
+export FB_CREDENTIALS='<credentials-file-content>'
+export FB_DB_URL='<database-url>'
 ```
 
 - Start the server:

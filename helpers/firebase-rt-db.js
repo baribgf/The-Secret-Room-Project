@@ -1,8 +1,11 @@
-const firebaseAdmin = require("firebase-admin");
+const firebaseAdmin = require("firebase-admin")
 
 class FirebaseRtDB {
-    constructor(creds) {
-        firebaseAdmin.initializeApp(eval(`new Object(${creds})`))
+    constructor(credentialsPath, databaseUrl) {
+        firebaseAdmin.initializeApp({
+            credential: firebaseAdmin.credential.cert(credentialsPath),
+            databaseURL: databaseUrl
+        })
         this.database = firebaseAdmin.database()
     }
 

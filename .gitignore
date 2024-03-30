@@ -2,5 +2,7 @@ node_modules
 backup
 .vscode
 private/**
+!.gitkeep
 package-lock.json
 .gitpod.yml
+.env
