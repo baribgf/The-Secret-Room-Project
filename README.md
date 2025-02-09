@@ -1,9 +1,9 @@
 # The SecretRoom Project
 
 This a `secret room` project where you can get a secret conversation with any persons you invite.
-The project is build in `Express js` framework implementing the `Firebase API` for db management.
+The project is based on `Express js` framework, and `Firebase` for db management.
 
-- You can try the current production version from here: [Goto SecretRoom](https://secretroom.cyclic.app)
+- You can try the current running version from here: [Goto SecretRoom](https://secretroom.cyclic.app)
 
 ## Usage
 To start using this project ensure the following steps:
